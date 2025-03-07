@@ -9,8 +9,8 @@ const experienceSchema = new mongoose.Schema({
   },
   company: String,
   position: String,
-  startDate: Date,
-  endDate: Date,
+  startDate: String,
+  endDate: String,
   description: String
 }, { timestamps: true });
 

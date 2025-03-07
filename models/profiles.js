@@ -12,6 +12,7 @@ fullName: { type: String, required: false,default:"N/A"},
   profileImage: { type: String, default: "N/A" },
    imageKey: { type: String, default: "N/A" },
   bio: { type: String, default: "N/A" },
+city:{type:String,default : "N/A"},
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

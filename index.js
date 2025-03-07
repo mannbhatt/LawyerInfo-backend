@@ -4,7 +4,7 @@ const { serve } = require('@hono/node-server');
 const mongoose = require('mongoose');
 const { cors } = require('hono/cors');
 const authRoutes=require('./routes/auth')
-
+//const userRoutes = require('./routes/user');
 const profileRoutes = require('./routes/profile');
 const educationRoutes = require('./routes/education');
 const experienceRoutes = require('./routes/experience');
@@ -31,7 +31,7 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 app.route('/api/auth', authRoutes);
-
+//app.route('/users', userRoutes);
 app.route('/profiles', profileRoutes);
 app.route('/education', educationRoutes);
 app.route('/experience', experienceRoutes);
