@@ -24,10 +24,10 @@ const existingUserEmail= await User.findOne({ email });
 
     const passwordHash = await bcrypt.hash(password, 10);
     
-    const newUser = new User({ username, email, passwordHash,});
+    const newUser = new User({ username, email, passwordHash });
     await newUser.save();
     
-    const token = jwt.sign({ id: newUser._id ,username:newUser.username,email:newUser.email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: newUser._id ,username:user.username,email:user.email }, process.env.JWT_SECRET, {
       expiresIn: "7h", 
     });
 

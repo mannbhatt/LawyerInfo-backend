@@ -19,11 +19,7 @@ const userSchema = new mongoose.Schema({
   profileId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Profile'
-  },
-flag:{
-type:Boolean,
-default:false,
-},
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
