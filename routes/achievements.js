@@ -69,10 +69,11 @@ licenseRoute.get("/:id", verifyToken, async (c) => {
 
 // 🔹 Update certifications for a user
 licenseRoute.put("/me", verifyToken, async (c) => {
-  try {
-    const userId = c.get("user").id;
+  
+   try{ const userId = c.get("user").id;
+	
     const certificationData = await c.req.json();
-
+	
     if (!Array.isArray(certificationData) || certificationData.length === 0) {
       return c.json({ success: false, message: "Invalid or empty certification data" }, 400);
     }
@@ -86,6 +87,7 @@ licenseRoute.put("/me", verifyToken, async (c) => {
     );
 
     return c.json({ success: true, message: "Certifications updated successfully", updatedCertifications });
+
   } catch (error) {
     return c.json({ success: false, message: error.message }, 500);
   }
