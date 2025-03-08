@@ -18,7 +18,7 @@ const company = require("./routes/company");
 const app = new Hono();
 
 app.use(cors({
-  origin: ["http://localhost:5000", "http://localhost:3000", "https://yourfrontend.com"],
+  origin: ["http://localhost:5000","https://lawyerinfo-frontend.onrender.com/" ,"http://localhost:3000", "https://yourfrontend.com"],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
