@@ -26,11 +26,11 @@ profiledataRoute.get("/:user_id", async (c) => {
     // Fetch related data from other collections
     const educationRecords = await Education.find({ userId: user_id });
     const experienceRecords = await Experience.find({ userId: user_id });
-    const about = await About.findOne({ userId: user_id });
-    const achievements = await Achievements.find({ userId: user_id });
-    const contributions = await Contribution.find({ userId: user_id });
-    const skills = await Skills.findOne({ userId: user_id });
-    const socialLinks = await SocialLink.findOne({ userId: user_id });
+    const about = await About.findOne({ user_id: user_id });
+    const achievements = await Achievements.find({ user_id: user_id });
+    const contributions = await Contribution.find({ user_id: user_id });
+    const skills = await Skills.findOne({ user_id: user_id });
+    const socialLinks = await SocialLink.findOne({ user_id: user_id });
 
     // Combine all data into a single response object
     const responseData = {
