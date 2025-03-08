@@ -162,48 +162,62 @@ profileRoute.get("/", async (c) => {
 
 profileRoute.get("/search", async (req, res) => {
   try {
-    const { username, city } = req.query;
-	console.log(">>>>>>>>>>>>>>>>>>>>>>>")
+    const { username, city } = req.query
+
     if (!username && !city) {
-      return res.status(400).json({ success: false, error: "Provide at least a username or city to search." });
+      return res.status(400).json({ success: false, message: "Please provide a username or city to search." })
     }
 
-    let matchQuery = {};
-
+    // Build search query using regex for case-insensitive matching
+    const query = {}
     if (username) {
-      // 🔍 Find users with matching usernames (case-insensitive)
-      const users = await User.find({  $regex: username, $options: "i"}).select("_id username");
-console.log(">>>>>>>>>>>>>>>>>>>>>>>")    ;
-  if (users.length === 0) return res.status(404).json({ success: false, message: "No users found with that username." });
-	
-      // Extract user IDs to use for profile filtering
-      matchQuery.userId = { $in: users.map((user) => user._id) };
+      query.fullName = { $regex: username, $options: "i" } // Case-insensitive search on fullName
+    }
+    if (city) {
+      query.city = { $regex: city, $options: "i" } // Case-insensitive search on city
     }
 
-    if (city) {
-      matchQuery.city = { $regex: city, $options: "i" }; // 🔍 Case-insensitive city search
-    }
-console.log(">>>>>>>>>>>>>>>>>>>>>>>")
-    // ✅ Fetch profiles matching criteria
-    const profiles = await Profile.find(matchQuery).populate("userId", "username profileImage");
+    // Find profiles matching the query
+    const profiles = await Profile.find(query)
 
     if (profiles.length === 0) {
-      return res.status(404).json({ success: false, message: "No profiles found." });
+      return res.status(404).json({ success: false, message: "No matching profiles found." })
     }
-console.log(">>>>>>>>>>>>>>>>>>>>>>>")
-    // ✅ Format response data
-    const results = profiles.map((profile) => ({
-      username: profile.userId.username,
-      profileImage: profile.userId.profileImage || "/default-profile.png",
-      city: profile.city,
-    }));
 
-    res.json({ success: true, users: results });
+    // Find user details using userId from the profile
+    const userIds = profiles.map((profile) => profile.userId)
+
+    // Make sure all userIds are valid ObjectIds before querying
+    const validUserIds = userIds.filter((id) => {
+      try {
+        // Check if the ID is a valid MongoDB ObjectId
+        return mongoose.Types.ObjectId.isValid(id)
+      } catch (error) {
+        console.warn(`Invalid ObjectId: ${id}`)
+        return false
+      }
+    })
+
+    const users = await User.find({ _id: { $in: validUserIds } }, "username profileImage")
+
+    // Combine profile and user data
+    const result = profiles.map((profile) => {
+      const user = users.find((user) => user._id.toString() === profile.userId.toString())
+      return {
+        username: user?.username || "Unknown",
+        profileImage: user?.profileImage || "/default-profile.png",
+        fullName: profile.fullName,
+        city: profile.city,
+        id: profile._id, // Include profile ID for unique key in frontend
+      }
+    })
+
+    res.json({ success: true, users: result })
   } catch (error) {
-    console.error("Search Error:", error);
-    res.status(500).json({ success: false, error: error.message });
+    console.error("Error searching profiles:", error)
+    res.status(500).json({ success: false, message: "Internal Server Error", error: error.message })
   }
+})
 
-});
 
 module.exports = profileRoute;
