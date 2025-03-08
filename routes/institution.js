@@ -1,5 +1,5 @@
 const { Hono } = require("hono");
-const Institution = require("../models/Institution");
+const Institution = require("../models/institution");
 
 const institutionRoute = new Hono();
 
