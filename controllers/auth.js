@@ -28,7 +28,7 @@ const existingUserEmail= await User.findOne({ email });
     await newUser.save();
     
     const token = jwt.sign({ id: newUser._id ,username:newUser.username,email:newUser.email }, process.env.JWT_SECRET, {
-      expiresIn: "7h", 
+      expiresIn: "30h", 
     });
 
     return c.json({
@@ -82,7 +82,7 @@ const signIn = async (c) => {
     }
 
     const token = jwt.sign({ id: user._id ,username:user.username,email:user.email}, process.env.JWT_SECRET, {
-      expiresIn: "7h", 
+      expiresIn: "30h", 
     });
 
     
