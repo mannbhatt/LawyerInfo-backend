@@ -17,7 +17,7 @@ profiledataRoute.get("/:user_id", async (c) => {
 
     // Fetch the user profile
     const profile = await Profile.findOne({ userId: user_id });
-    if (!profile) return c.json({ success: false, error: "Profile not found" }, 404);
+
 
     // Fetch the user details from User collection (username, email, etc.)
     const user = await User.findById(user_id).select("username profileImage email");
