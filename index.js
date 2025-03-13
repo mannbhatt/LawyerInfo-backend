@@ -16,6 +16,7 @@ const contribution=require('./routes/contribution');
 const institution = require("./routes/institution");
 const company = require("./routes/company");
 const profileData=require("./routes/profilesdata");
+const searchdata=require("./routes/searchdata");
 const app = new Hono();
 app.use(cors({
   origin: "*",
@@ -43,6 +44,7 @@ app.route('/contribution',contribution);
 app.route("/institutions", institution);
 app.route("/companies", company);
 app.route("/profiledata",profileData);
+app.route("/searchdata",searchdata);
 app.get('/', (c) => c.text('Welcome to Lawyer Info API 🚀'));
 
 serve({
