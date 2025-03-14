@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const nodemailer = require("nodemailer");
 
 require("dotenv").config();
 
@@ -101,6 +102,77 @@ const signIn = async (c) => {
   }
 };
 
+
+
+const forgotPassword= async (c) => {
+  try {
+    const { email } = await c.req.json();
+
+    const user = await User.findOne({ email });
+    if (!user) return c.json({ message: "User not found" }, 404);
+	console.log("1")
+    // Generate Reset Token (Valid for 1 hour)
+    const resetToken = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Send Reset Email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // Your Gmail
+        pass: process.env.EMAIL_PASS, // Gmail App Password
+      },
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+
+    const mailOptions = {
+      to: email,
+      from: process.env.EMAIL_USER,
+      subject: "Password Reset Request",
+      text: `Click the link to reset your password: ${resetUrl}\n\nThis link expires in 1 hour.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return c.json({ message: "Password reset link sent to email." });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return c.json({ error: "Internal server error" }, 500);
+  }
+};
+
+const resetPassword= async (c) => {
+  try {
+    const { token, newPassword } = await c.req.json();
+
+    // Verify Reset Token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      return c.json({ message: "Invalid or expired token" }, 400);
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) return c.json({ message: "User not found" }, 404);
+
+    // Hash New Password
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return c.json({ message: "Password reset successful." });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    return c.json({ error: "Internal server error" }, 500);
+  }
+};
+
+
+
 const username = async (c) => {
   try {
 	
@@ -119,4 +191,6 @@ const username = async (c) => {
   }
 };
 
-module.exports = { signUp, signIn,username };
+
+
+module.exports = { signUp, signIn,username ,forgotPassword,resetPassword};
