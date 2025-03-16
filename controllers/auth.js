@@ -192,5 +192,50 @@ const username = async (c) => {
 };
 
 
+const usernameEdit= async (c) => {
+  try {
+    const userId = c.get("user").id; // Get user ID from token
+   const body = await c.req.json(); // Read request body
+  
 
-module.exports = { signUp, signIn,username ,forgotPassword,resetPassword};
+    const { username } = body;
+    
+    if (!username || username.length < 3 || username.length > 30) {
+      return c.json({ success: false, message: "Username must be between 3 and 30 characters." }, 400);
+    }
+
+   
+    if (!/^[a-z0-9_.-]+$/.test(username)) {
+      return c.json({ success: false, message: "Username can only contain lowercase letters, numbers, underscores, dots, and hyphens." }, 400);
+    }
+
+   
+    const user = await User.findById(userId);
+    if (!user) {
+      return c.json({ success: false, message: "User not found." }, 404);
+    }
+
+  
+    if (user.username === username) {
+      return c.json({ success: false, message: "Please enter a different username." }, 400);
+    }
+
+   
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return c.json({ success: false, message: "Username is already taken." }, 400);
+    }
+
+   
+    user.username = username;
+    await user.save();
+
+    return c.json({ success: true, message: "Username updated successfully.", username });
+  } catch (error) {
+    console.error("Error updating username:", error);
+    return c.json({ success: false, message: "Internal server error" }, 500);
+  }
+};
+
+
+module.exports = { signUp, signIn,username ,forgotPassword,resetPassword,usernameEdit};

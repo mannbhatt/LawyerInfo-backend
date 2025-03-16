@@ -6,7 +6,7 @@ const router = new Hono();
 router.post("/signup", authController.signUp);
 router.post("/signin", authController.signIn);
 router.get("/:username", authController.username);
-
+router.put("/username/me", verifyToken, authController.usernameEdit);
 router.post("/forgot-password",authController.forgotPassword);
 router.post("/reset-password",authController.resetPassword);
 module.exports = router;
